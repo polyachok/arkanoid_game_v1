@@ -313,7 +313,7 @@ class Block {
         Utils.drawGlow(ctx, () => {
             const grad = ctx.createLinearGradient(drawX, drawY, drawX, drawY + this.height);
 
-            } else if (this.type === 'steel') {
+            if (this.type === 'steel') {
                 // Неразрушимый блок - тёмный с металлическим блеском
                 grad.addColorStop(0, '#4A5D63');
                 grad.addColorStop(1, '#2F4F4F');
