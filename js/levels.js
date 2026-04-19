@@ -64,17 +64,22 @@ const Levels = {
                 
                 // Определяем тип блока
                 let type = 'normal';
-                let hp = row < 2 ? hpMult : 1;
+                let hp = 1;
                 
-                // Добавляем неразрушимые блоки (steel) с прогрессией по уровням
-                if (levelNum >= 3 && Math.random() < 0.05 + (levelNum * 0.01)) {
+                // Неразрушимые блоки (steel) - на всех уровнях, больше с каждым уровнем
+                const steelChance = Math.min(0.05 + (levelNum * 0.02), 0.25); // 5-25%
+                if (Math.random() < steelChance) {
                     type = 'steel';
                     hp = 999; // Неразрушимый
                 }
-                // Добавляем усиленные блоки (strong) - требуют 2 попаданий
-                else if (levelNum >= 2 && Math.random() < 0.1 + (levelNum * 0.015)) {
+                // Усиленные блоки (strong) - требуют 2 попаданий, на всех уровнях
+                else if (Math.random() < 0.15 + (levelNum * 0.02)) { // 15-35%
                     type = 'strong';
                     hp = 2; // Два попадания
+                }
+                // Обычные блоки с HP для верхних рядов
+                else {
+                    hp = row < 2 ? hpMult : 1;
                 }
                 
                 const color = palette[(row + col) % palette.length];
@@ -102,17 +107,21 @@ const Levels = {
                 
                 // Определяем тип блока
                 let type = 'normal';
-                let hp = row < hpMult ? hpMult : 1;
+                let hp = 1;
                 
-                // Добавляем неразрушимые блоки (steel) с прогрессией по уровням
-                if (levelNum >= 3 && Math.random() < 0.05 + (levelNum * 0.01)) {
+                // Неразрушимые блоки (steel) - на всех уровнях
+                const steelChance = Math.min(0.05 + (levelNum * 0.02), 0.25);
+                if (Math.random() < steelChance) {
                     type = 'steel';
                     hp = 999;
                 }
-                // Добавляем усиленные блоки (strong)
-                else if (levelNum >= 2 && Math.random() < 0.1 + (levelNum * 0.015)) {
+                // Усиленные блоки (strong) - на всех уровнях
+                else if (Math.random() < 0.15 + (levelNum * 0.02)) {
                     type = 'strong';
                     hp = 2;
+                }
+                else {
+                    hp = row < hpMult ? hpMult : 1;
                 }
                 
                 const color = palette[row % palette.length];

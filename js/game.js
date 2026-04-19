@@ -40,8 +40,8 @@ class Game {
         // Экранная тряска
         this.shakeAmount = 0;
 
-        // Комбо-индикатор
-        this.comboText = null;
+        // Комбо-индикатор (массив для нескольких текстов)
+        this.comboTexts = [];
 
         // Таймер ускорения мяча
         this.speedUpTimer = 0;
@@ -123,6 +123,7 @@ class Game {
         this.bonuses = [];
         this.particles = [];
         this.combo = 0;
+        this.comboTexts = []; // Очищаем тексты бонусов
         
         // Запуск таймера раунда
         this.roundStartTime = Date.now();
@@ -201,15 +202,15 @@ class Game {
         }
     }
 
-    // Комбо-индикатор
+    // Комбо-индикатор (теперь добавляет в массив, не заменяет)
     showComboText(text, color) {
-        this.comboText = {
+        this.comboTexts.push({
             text,
             color,
             alpha: 1,
-            y: this.height / 2,
-            timer: 90,
-        };
+            y: this.height / 2 + (this.comboTexts.length * 30), // Смещение для каждого нового
+            timer: 180, // Увеличено с 90 до 180 (3 секунды вместо 1.5)
+        });
     }
 
     // Коллизия мяча с блоками
@@ -427,13 +428,14 @@ class Game {
             this.shakeAmount = 0;
         }
 
-        // Комбо-текст
-        if (this.comboText) {
-            this.comboText.timer--;
-            this.comboText.y -= 0.5;
-            this.comboText.alpha = this.comboText.timer / 90;
-            if (this.comboText.timer <= 0) {
-                this.comboText = null;
+        // Комбо-тексты (массив - все активные тексты)
+        for (let i = this.comboTexts.length - 1; i >= 0; i--) {
+            const ct = this.comboTexts[i];
+            ct.timer--;
+            ct.y -= 0.8; // Плывут вверх
+            ct.alpha = ct.timer / 180;
+            if (ct.timer <= 0) {
+                this.comboTexts.splice(i, 1);
             }
         }
 
@@ -513,19 +515,19 @@ class Game {
             particle.draw(ctx);
         }
 
-        // Комбо-индикатор
-        if (this.comboText) {
-            ctx.globalAlpha = this.comboText.alpha;
-            ctx.fillStyle = this.comboText.color;
+        // Комбо-индикаторы (рисуем все активные тексты)
+        for (const ct of this.comboTexts) {
+            ctx.globalAlpha = ct.alpha;
+            ctx.fillStyle = ct.color;
             ctx.font = 'bold 28px Segoe UI';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.shadowColor = this.comboText.color;
+            ctx.shadowColor = ct.color;
             ctx.shadowBlur = 15;
-            ctx.fillText(this.comboText.text, this.width / 2, this.comboText.y);
+            ctx.fillText(ct.text, this.width / 2, ct.y);
             ctx.shadowBlur = 0;
-            ctx.globalAlpha = 1;
         }
+        ctx.globalAlpha = 1;
 
         // Индикатор комбо
         if (this.combo > 2) {

@@ -237,16 +237,16 @@ class Block {
         // Типы блоков: 'normal', 'strong', 'steel'
         this.type = type;
         
-        // Для strong блоков - цвета при повреждениях
-        this.strongColors = ['#FFD700', '#FFA500', '#FF4500']; // Золотой -> Оранжевый -> Красный
+        // Для strong блоков - цвета при повреждениях (темнее)
+        this.strongColors = ['#8B7500', '#B86600', '#C94200']; // Тёмно-золотой -> Тёмно-оранжевый -> Красно-коричневый
         
         // Настройка внешнего вида в зависимости от типа
         if (this.type === 'steel') {
-            this.color = '#708090'; // SlateGray - неразрушимый
-            this.borderColor = '#2F4F4F';
+            this.color = '#2F4F4F'; // DarkSlateGray - более тёмный неразрушимый
+            this.borderColor = '#1A3A3A';
         } else if (this.type === 'strong') {
             this.color = this.strongColors[0];
-            this.borderColor = '#B8860B';
+            this.borderColor = '#6B5E00';
         } else {
             this.borderColor = Utils.lerpColor(color, '#000000', 0.3);
         }
@@ -313,14 +313,14 @@ class Block {
         Utils.drawGlow(ctx, () => {
             const grad = ctx.createLinearGradient(drawX, drawY, drawX, drawY + this.height);
 
-            if (this.type === 'steel') {
-                // Неразрушимый блок
-                grad.addColorStop(0, '#708090');
+            } else if (this.type === 'steel') {
+                // Неразрушимый блок - тёмный с металлическим блеском
+                grad.addColorStop(0, '#4A5D63');
                 grad.addColorStop(1, '#2F4F4F');
             } else if (this.type === 'strong') {
-                // Усиленный блок с градиентом по цвету
+                // Усиленный блок с градиентом по цвету (тёмный)
                 grad.addColorStop(0, this.color);
-                grad.addColorStop(1, Utils.lerpColor(this.color, '#000000', 0.3));
+                grad.addColorStop(1, Utils.lerpColor(this.color, '#000000', 0.5));
             } else {
                 // Обычный блок
                 const healthRatio = this.hp / this.maxHp;
