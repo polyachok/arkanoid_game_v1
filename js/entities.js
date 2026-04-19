@@ -115,6 +115,10 @@ class Paddle {
         this.expanded = false;
         this.expandTimer = 0;
         this.expandDuration = 600; // 10 сек при 60fps
+        this.shrunk = false;
+        this.shrinkTimer = 0;
+        this.shrinkDuration = 480; // 8 сек
+        this.baseWidth = width; // исходная ширина
     }
 
     expand() {
@@ -133,9 +137,17 @@ class Paddle {
         if (this.expanded) {
             this.expandTimer--;
             if (this.expandTimer <= 0) {
-                this.targetWidth = this.width;
-                this.width = this.targetWidth;
+                this.targetWidth = this.baseWidth;
                 this.expanded = false;
+            }
+        }
+
+        // Таймер сжатия
+        if (this.shrunk) {
+            this.shrinkTimer--;
+            if (this.shrinkTimer <= 0) {
+                this.targetWidth = this.baseWidth;
+                this.shrunk = false;
             }
         }
     }

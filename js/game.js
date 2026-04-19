@@ -39,6 +39,10 @@ class Game {
         // Комбо-индикатор
         this.comboText = null;
 
+        // Таймер ускорения мяча
+        this.speedUpTimer = 0;
+        this.speedUpDuration = 480; // 8 сек
+
         // Настройка canvas
         this.setupCanvas();
 
@@ -129,6 +133,24 @@ class Game {
             case 'extraLife':
                 this.lives = Math.min(this.lives + 1, 5);
                 this.showComboText('+Жизнь!', '#ffaa00');
+                break;
+            // Анти-бонусы
+            case 'shrinkPaddle':
+                this.paddle.shrunk = true;
+                this.paddle.shrinkTimer = 480; // 8 сек
+                this.paddle.targetWidth = this.paddle.baseWidth * 0.7;
+                this.showComboText('-Уменьшение!', '#ff2255');
+                break;
+            case 'speedUp':
+                this.speedUpTimer = this.speedUpDuration;
+                for (const ball of this.balls) {
+                    ball.changeSpeed(1.4);
+                }
+                this.showComboText('-Ускорение!', '#cc22ff');
+                break;
+            case 'stealLife':
+                this.lives = Math.max(this.lives - 1, 1);
+                this.showComboText('-Потеря жизни!', '#666666');
                 break;
         }
     }
@@ -339,6 +361,16 @@ class Game {
 
         // Частицы
         this.particles = this.particles.filter(p => Utils.updateParticle(p));
+
+        // Сброс скорости мяча после окончания ускорения
+        if (this.speedUpTimer > 0) {
+            this.speedUpTimer--;
+            if (this.speedUpTimer <= 0) {
+                for (const ball of this.balls) {
+                    ball.changeSpeed(1 / 1.4);
+                }
+            }
+        }
 
         // Тряска экрана
         if (this.shakeAmount > 0.1) {
