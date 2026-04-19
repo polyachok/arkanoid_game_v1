@@ -197,7 +197,7 @@ class Paddle {
 
 // ===== БЛОК =====
 class Block {
-    constructor(x, y, width, height, hp, color, points) {
+    constructor(x, y, width, height, hp, color, points, type = 'normal') {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -209,17 +209,64 @@ class Block {
         this.active = true;
         this.radius = 4;
         this.shakeOffset = 0;
+        
+        // Типы блоков: 'normal', 'strong', 'steel'
+        this.type = type;
+        
+        // Для strong блоков - цвета при повреждениях
+        this.strongColors = ['#FFD700', '#FFA500', '#FF4500']; // Золотой -> Оранжевый -> Красный
+        
+        // Настройка внешнего вида в зависимости от типа
+        if (this.type === 'steel') {
+            this.color = '#708090'; // SlateGray - неразрушимый
+            this.borderColor = '#2F4F4F';
+        } else if (this.type === 'strong') {
+            this.color = this.strongColors[0];
+            this.borderColor = '#B8860B';
+        } else {
+            this.borderColor = Utils.lerpColor(color, '#000000', 0.3);
+        }
     }
 
     hit() {
+        if (!this.active) return false;
+
+        // Неразрушимые блоки
+        if (this.type === 'steel') {
+            this.shakeOffset = 2; // Просто трясется
+            return false; 
+        }
+
+        // Усиленные блоки требуют 2 попаданий
+        if (this.type === 'strong') {
+            this.hp--;
+            this.shakeOffset = 3;
+            
+            if (this.hp <= 0) {
+                this.active = false;
+                return true; // Разрушен
+            } else {
+                // Меняем цвет при попадании
+                const nextColorIndex = Math.min(this.maxHp - this.hp, this.strongColors.length - 1);
+                this.color = this.strongColors[nextColorIndex];
+                return false; // Еще не разрушен
+            }
+        }
+
+        // Обычный блок
         this.hp--;
         this.shakeOffset = 3;
         if (this.hp <= 0) {
             this.active = false;
+            return true;
         }
+        return false;
     }
 
     getFillColor() {
+        if (this.type === 'steel') return this.color;
+        if (this.type === 'strong') return this.color; // Уже меняем в hit()
+        
         const healthRatio = this.hp / this.maxHp;
         if (healthRatio > 0.6) return this.color;
         if (healthRatio > 0.3) {
@@ -240,18 +287,29 @@ class Block {
         const drawY = this.y + shakeY;
 
         Utils.drawGlow(ctx, () => {
-            const healthRatio = this.hp / this.maxHp;
             const grad = ctx.createLinearGradient(drawX, drawY, drawX, drawY + this.height);
 
-            if (healthRatio > 0.6) {
+            if (this.type === 'steel') {
+                // Неразрушимый блок
+                grad.addColorStop(0, '#708090');
+                grad.addColorStop(1, '#2F4F4F');
+            } else if (this.type === 'strong') {
+                // Усиленный блок с градиентом по цвету
                 grad.addColorStop(0, this.color);
                 grad.addColorStop(1, Utils.lerpColor(this.color, '#000000', 0.3));
-            } else if (healthRatio > 0.3) {
-                grad.addColorStop(0, Utils.lerpColor(this.color, '#ffaa00', 0.4));
-                grad.addColorStop(1, Utils.lerpColor(this.color, '#ff4400', 0.3));
             } else {
-                grad.addColorStop(0, '#ff6644');
-                grad.addColorStop(1, '#cc2200');
+                // Обычный блок
+                const healthRatio = this.hp / this.maxHp;
+                if (healthRatio > 0.6) {
+                    grad.addColorStop(0, this.color);
+                    grad.addColorStop(1, Utils.lerpColor(this.color, '#000000', 0.3));
+                } else if (healthRatio > 0.3) {
+                    grad.addColorStop(0, Utils.lerpColor(this.color, '#ffaa00', 0.4));
+                    grad.addColorStop(1, Utils.lerpColor(this.color, '#ff4400', 0.3));
+                } else {
+                    grad.addColorStop(0, '#ff6644');
+                    grad.addColorStop(1, '#cc2200');
+                }
             }
 
             ctx.beginPath();
@@ -265,15 +323,37 @@ class Block {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
             ctx.fill();
 
-            // Индикатор HP (если > 1)
-            if (this.maxHp > 1) {
+            // Рамка для особых типов
+            if (this.type === 'steel' || this.type === 'strong') {
+                ctx.strokeStyle = this.borderColor;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(drawX + 1, drawY + 1, this.width - 2, this.height - 2);
+            }
+
+            // Специфичные детали для типов блоков
+            if (this.type === 'steel') {
+                // Иконка замка
+                ctx.fillStyle = '#A9A9A9';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🔒', drawX + this.width / 2, drawY + this.height / 2);
+            } else if (this.type === 'strong') {
+                // Индикатор прочности (цифра)
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.hp, drawX + this.width / 2, drawY + this.height / 2);
+            } else if (this.maxHp > 1) {
+                // Для обычных блоков с HP > 1
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
                 ctx.font = 'bold 11px Segoe UI';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(this.hp, drawX + this.width / 2, drawY + this.height / 2);
             }
-        }, this.color, 6);
+        }, this.type === 'steel' ? '#708090' : this.color, 6);
     }
 }
 

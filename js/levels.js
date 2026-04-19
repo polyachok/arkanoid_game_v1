@@ -61,9 +61,24 @@ const Levels = {
             for (let col = 0; col < cols; col++) {
                 const x = startX + col * (blockWidth + this.blockPadding);
                 const y = this.blockTopOffset + row * (blockHeight + this.blockPadding);
-                const hp = row < 2 ? hpMult : 1;
+                
+                // Определяем тип блока
+                let type = 'normal';
+                let hp = row < 2 ? hpMult : 1;
+                
+                // Добавляем неразрушимые блоки (steel) с прогрессией по уровням
+                if (levelNum >= 3 && Math.random() < 0.05 + (levelNum * 0.01)) {
+                    type = 'steel';
+                    hp = 999; // Неразрушимый
+                }
+                // Добавляем усиленные блоки (strong) - требуют 2 попаданий
+                else if (levelNum >= 2 && Math.random() < 0.1 + (levelNum * 0.015)) {
+                    type = 'strong';
+                    hp = 2; // Два попадания
+                }
+                
                 const color = palette[(row + col) % palette.length];
-                blocks.push(new Block(x, y, blockWidth, blockHeight, hp, color));
+                blocks.push(new Block(x, y, blockWidth, blockHeight, hp, color, null, type));
             }
         }
         return blocks;
@@ -84,9 +99,24 @@ const Levels = {
             for (let col = 0; col < cols; col++) {
                 const x = startX + col * (blockWidth + this.blockPadding);
                 const y = this.blockTopOffset + row * (blockHeight + this.blockPadding);
-                const hp = row < hpMult ? hpMult : 1;
+                
+                // Определяем тип блока
+                let type = 'normal';
+                let hp = row < hpMult ? hpMult : 1;
+                
+                // Добавляем неразрушимые блоки (steel) с прогрессией по уровням
+                if (levelNum >= 3 && Math.random() < 0.05 + (levelNum * 0.01)) {
+                    type = 'steel';
+                    hp = 999;
+                }
+                // Добавляем усиленные блоки (strong)
+                else if (levelNum >= 2 && Math.random() < 0.1 + (levelNum * 0.015)) {
+                    type = 'strong';
+                    hp = 2;
+                }
+                
                 const color = palette[row % palette.length];
-                blocks.push(new Block(x, y, blockWidth, blockHeight, hp, color));
+                blocks.push(new Block(x, y, blockWidth, blockHeight, hp, color, null, type));
             }
             row++;
             cols -= 2;
