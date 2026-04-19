@@ -20,6 +20,10 @@ class Game {
         this.level = 1;
         this.combo = 0;
         this.maxCombo = 0;
+        
+        // Время раунда
+        this.roundStartTime = 0;
+        this.roundTime = 0; // в секундах
 
         // Сущности
         this.balls = [];
@@ -119,6 +123,10 @@ class Game {
         this.bonuses = [];
         this.particles = [];
         this.combo = 0;
+        
+        // Запуск таймера раунда
+        this.roundStartTime = Date.now();
+        this.roundTime = 0;
     }
 
     startGame() {
@@ -161,9 +169,7 @@ class Game {
                 break;
             // Анти-бонусы
             case 'shrinkPaddle':
-                this.paddle.shrunk = true;
-                this.paddle.shrinkTimer = 480; // 8 сек
-                this.paddle.targetWidth = this.paddle.baseWidth * 0.7;
+                this.paddle.shrinkPaddle();
                 this.showComboText('-Уменьшение!', bonus.revealedColor);
                 break;
             case 'speedUp':
@@ -236,9 +242,10 @@ class Game {
                 this.combo++;
                 this.maxCombo = Math.max(this.maxCombo, this.combo);
 
-                // Очки с бонусом за комбо
-                const comboMultiplier = 1 + this.combo * 0.1;
-                this.score += Math.floor(block.points * comboMultiplier);
+                // Очки с бонусом за комбо (повышающий коэффициент)
+                const comboMultiplier = 1 + (this.combo - 1) * 0.1; // +10% за каждый удар в комбо
+                const pointsEarned = Math.floor(block.points * comboMultiplier);
+                this.score += pointsEarned;
 
                 // Частицы
                 const blockCenterX_pos = block.x + block.width / 2;
@@ -271,10 +278,8 @@ class Game {
                     ));
                 }
 
-                // Удаляем мёртвые блоки
-                if (!block.active) {
-                    this.score += block.points;
-                }
+                // Удаляем мёртвые блоки (очки уже начислены выше с комбо-множителем)
+                // Дополнительное начисление очков убираем, чтобы не дублировать
 
                 break; // Один блок за кадр
             }
@@ -334,6 +339,9 @@ class Game {
 
         // Фон — плавная смена
         this.bgHue = Utils.lerp(this.bgHue, this.bgTargetHue, 0.01);
+        
+        // Обновление времени раунда
+        this.roundTime = Math.floor((Date.now() - this.roundStartTime) / 1000);
 
         // Платформа
         this.paddle.update();
@@ -545,7 +553,17 @@ class Game {
             score: this.score,
             level: this.level,
             lives: '❤'.repeat(Math.max(0, this.lives)),
+            time: this.formatTime(this.roundTime),
+            combo: this.combo,
+            maxCombo: this.maxCombo
         };
+    }
+    
+    // Форматирование времени (мм:сс)
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
     // Следующий уровень
