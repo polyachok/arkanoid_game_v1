@@ -25,9 +25,27 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #050505; /* Очень темный базовый цвет */
+    transition: background 1s ease-in-out; /* Плавная смена фона */
+}
+
+/* Элемент фона уровня (добавляется через JS) */
+.level-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    /* Градиент туннеля по умолчанию */
+    background: radial-gradient(circle at center, rgba(30, 30, 60, 0.4) 0%, rgba(5, 5, 15, 0.8) 70%, #000000 100%);
+    transition: opacity 0.5s ease-in-out;
 }
 
 #gameCanvas {
+    position: relative;
+    z-index: 1;
     display: block;
     border-radius: 8px;
     box-shadow:
@@ -36,6 +54,7 @@ body {
     /* Canvas занимает максимум места, сохраняя пропорции */
     max-width: 100%;
     max-height: 100%;
+    background: transparent; /* Canvas теперь прозрачный, фон виден сквозь него */
 }
 
 /* ===== HUD ===== */

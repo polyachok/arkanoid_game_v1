@@ -1,1 +1,1 @@
-(js/entities.js, js/game.js, js/levels.js)
+Nothing needs to be added to .gitignore since the changes only include source files (.css and .js) without any build artifacts, dependencies, or temporary files.
