@@ -39,6 +39,14 @@ function updateHUD() {
     scoreDisplay.textContent = hud.score;
     levelDisplay.textContent = hud.level;
     livesDisplay.textContent = hud.lives;
+    
+    // Обновляем время и комбо если элементы существуют
+    if (timeDisplay) {
+        timeDisplay.textContent = hud.time;
+    }
+    if (comboDisplay) {
+        comboDisplay.textContent = hud.combo > 1 ? `x${hud.combo}` : '';
+    }
 }
 
 // ===== Состояния =====

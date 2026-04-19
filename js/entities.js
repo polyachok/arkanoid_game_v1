@@ -122,9 +122,33 @@ class Paddle {
     }
 
     expand() {
-        this.targetWidth = this.width * 1.5;
+        this.targetWidth = this.baseWidth * 1.5;
         this.expanded = true;
         this.expandTimer = this.expandDuration;
+        
+        // Сбрасываем сжатие если оно было
+        if (this.shrunk) {
+            this.shrunk = false;
+            this.shrinkTimer = 0;
+        }
+    }
+
+    shrinkPaddle() {
+        // Уменьшаем на 70% от базовой ширины (остаётся 30%)
+        const newWidth = Math.max(this.baseWidth * 0.3, 40); 
+        
+        // Применяем уменьшение только если платформа больше минимального размера
+        if (this.baseWidth > 50) {
+            this.targetWidth = newWidth;
+            this.shrunk = true;
+            this.shrinkTimer = 600; // Длительность эффекта (кадры)
+            
+            // Сбрасываем расширенное состояние, если оно было
+            if (this.expanded) {
+                this.expanded = false;
+                this.expandTimer = 0;
+            }
+        }
     }
 
     update() {
@@ -339,12 +363,38 @@ class Block {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('🔒', drawX + this.width / 2, drawY + this.height / 2);
             } else if (this.type === 'strong') {
-                // Индикатор прочности (цифра)
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                ctx.font = 'bold 14px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(this.hp, drawX + this.width / 2, drawY + this.height / 2);
+                // Усиленный блок - визуальный слой прочности (полоски/трещины вместо цифр)
+                const damageLevel = this.maxHp - this.hp; // 0 = нет повреждений, 1 = одно повреждение
+                
+                ctx.save();
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.lineWidth = 2;
+                
+                if (damageLevel === 0) {
+                    // Нет повреждений - гладкая поверхность с легкими линиями
+                    ctx.beginPath();
+                    ctx.moveTo(drawX + 4, drawY + 6);
+                    ctx.lineTo(drawX + this.width - 4, drawY + 6);
+                    ctx.moveTo(drawX + 6, drawY + 10);
+                    ctx.lineTo(drawX + this.width - 6, drawY + 10);
+                    ctx.stroke();
+                } else if (damageLevel === 1) {
+                    // Одно повреждение - трещины
+                    ctx.beginPath();
+                    ctx.moveTo(drawX + this.width / 2, drawY + 4);
+                    ctx.lineTo(drawX + this.width / 2 - 8, drawY + 12);
+                    ctx.moveTo(drawX + this.width / 2, drawY + 4);
+                    ctx.lineTo(drawX + this.width / 2 + 8, drawY + 12);
+                    ctx.moveTo(drawX + this.width / 2 - 5, drawY + 12);
+                    ctx.lineTo(drawX + this.width / 2 + 5, drawY + 18);
+                    ctx.stroke();
+                    
+                    // Затемнение
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+                    ctx.fillRect(drawX + 2, drawY + 2, this.width - 4, this.height - 4);
+                }
+                
+                ctx.restore();
             } else if (this.maxHp > 1) {
                 // Для обычных блоков с HP > 1
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
