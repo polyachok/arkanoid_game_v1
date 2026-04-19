@@ -12,6 +12,10 @@ const levelDisplay = document.getElementById('levelDisplay');
 const livesDisplay = document.getElementById('livesDisplay');
 const pauseBtn = document.getElementById('pauseBtn');
 
+// Дополнительные UI элементы (время и комбо)
+const timeDisplay = document.getElementById('timeDisplay');
+const comboDisplay = document.getElementById('comboDisplay');
+
 const menuOverlay = document.getElementById('menuOverlay');
 const pauseOverlay = document.getElementById('pauseOverlay');
 const winOverlay = document.getElementById('winOverlay');
