@@ -257,14 +257,20 @@ const Levels = {
         };
     },
 
-    // Шанс выпадения бонуса из блока (положительного)
+    // Шанс выпадения бонуса из блока (положительного) - теперь хаотично
     getBonusDropChance() {
-        return 0.12 + Math.random() * 0.08; // 12-20%
+        // Базовый шанс 15%, но с рандомизацией для хаотичности
+        const baseChance = 0.15;
+        const variance = Math.random() * 0.1; // +0-10%
+        return baseChance + variance; // 15-25%
     },
 
-    // Шанс выпадения анти-бонуса
+    // Шанс выпадения анти-бонуса - тоже хаотично
     getAntibonusDropChance() {
-        return 0.04 + Math.random() * 0.04; // 4-8%
+        // Базовый шанс 6%, реже положительных
+        const baseChance = 0.06;
+        const variance = Math.random() * 0.04; // +0-4%
+        return baseChance + variance; // 6-10%
     },
 
     // Тип бонуса (положительного)

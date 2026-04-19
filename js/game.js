@@ -118,39 +118,39 @@ class Game {
         switch (bonus.type) {
             case 'multiBall':
                 this.splitBall();
-                this.showComboText('+Множитель мячей!', '#ff2d95');
+                this.showComboText('+Множитель мячей!', bonus.revealedColor);
                 break;
             case 'expandPaddle':
                 this.paddle.expand();
-                this.showComboText('+Расширение!', '#00ff88');
+                this.showComboText('+Расширение!', bonus.revealedColor);
                 break;
             case 'slow':
                 for (const ball of this.balls) {
                     ball.changeSpeed(0.7);
                 }
-                this.showComboText('+Замедление!', '#00c8ff');
+                this.showComboText('+Замедление!', bonus.revealedColor);
                 break;
             case 'extraLife':
                 this.lives = Math.min(this.lives + 1, 5);
-                this.showComboText('+Жизнь!', '#ffaa00');
+                this.showComboText('+Жизнь!', bonus.revealedColor);
                 break;
             // Анти-бонусы
             case 'shrinkPaddle':
                 this.paddle.shrunk = true;
                 this.paddle.shrinkTimer = 480; // 8 сек
                 this.paddle.targetWidth = this.paddle.baseWidth * 0.7;
-                this.showComboText('-Уменьшение!', '#ff2255');
+                this.showComboText('-Уменьшение!', bonus.revealedColor);
                 break;
             case 'speedUp':
                 this.speedUpTimer = this.speedUpDuration;
                 for (const ball of this.balls) {
                     ball.changeSpeed(1.4);
                 }
-                this.showComboText('-Ускорение!', '#cc22ff');
+                this.showComboText('-Ускорение!', bonus.revealedColor);
                 break;
             case 'stealLife':
                 this.lives = Math.max(this.lives - 1, 1);
-                this.showComboText('-Потеря жизни!', '#666666');
+                this.showComboText('-Потеря жизни!', bonus.revealedColor);
                 break;
         }
     }
@@ -348,7 +348,19 @@ class Game {
                 { x: bonus.x, y: bonus.y, width: bonus.width, height: bonus.height },
                 { x: this.paddle.x, y: this.paddle.y, width: this.paddle.width, height: this.paddle.height }
             )) {
+                // Раскрываем бонус и применяем эффект
+                bonus.reveal();
                 this.applyBonus(bonus);
+                
+                // Визуальный эффект при поимке бонуса
+                this.particles.push(...Utils.createExplosion(
+                    bonus.x + bonus.width / 2,
+                    bonus.y + bonus.height / 2,
+                    bonus.revealedColor,
+                    20
+                ));
+                
+                // Удаляем бонус сразу после применения (визуально показываем в комбо-тексте)
                 this.bonuses.splice(i, 1);
                 continue;
             }
