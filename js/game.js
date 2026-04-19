@@ -225,8 +225,11 @@ class Game {
                 // Тряска экрана
                 this.shakeAmount = 3;
 
-                // Шанс положительного бонуса
-                if (block.active && Math.random() < Levels.getBonusDropChance()) {
+                // Шанс положительного бонуса (проверяем ДО того, как блок станет неактивным)
+                const bonusChance = Math.random();
+                const antibonusChance = Math.random();
+                
+                if (bonusChance < Levels.getBonusDropChance()) {
                     this.bonuses.push(new Bonus(
                         blockCenterX_pos - 12,
                         blockCenterY_pos - 12,
@@ -235,7 +238,7 @@ class Game {
                 }
 
                 // Шанс анти-бонуса (отдельный, реже)
-                if (block.active && Math.random() < Levels.getAntibonusDropChance()) {
+                if (antibonusChance < Levels.getAntibonusDropChance()) {
                     this.bonuses.push(new Bonus(
                         blockCenterX_pos - 12,
                         blockCenterY_pos - 12,
