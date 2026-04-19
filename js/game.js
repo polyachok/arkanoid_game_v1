@@ -117,6 +117,9 @@ class Game {
         this.blocks = levelData.blocks;
         this.bgTargetHue = (levelNum - 1) * 40;
 
+        // Обновление фона уровня
+        this.updateLevelBackground(levelNum);
+
         // Сброс сущностей
         this.createPaddle();
         this.createBall();
@@ -128,6 +131,33 @@ class Game {
         // Запуск таймера раунда
         this.roundStartTime = Date.now();
         this.roundTime = 0;
+    }
+
+    // Обновление фона в зависимости от уровня
+    updateLevelBackground(levelNum) {
+        // Удаляем старый фон
+        const oldBg = document.querySelector('.level-background');
+        if (oldBg) {
+            oldBg.remove();
+        }
+
+        // Создаем новый элемент фона
+        const bgElement = document.createElement('div');
+        bgElement.className = 'level-background';
+        
+        // Генерируем цвета для градиента на основе номера уровня
+        // Каждый уровень имеет уникальный оттенок туннеля
+        const hue = ((levelNum - 1) * 40) % 360;
+        const centerColor = `hsla(${hue}, 70%, 25%, 0.4)`;
+        const midColor = `hsla(${hue}, 60%, 15%, 0.6)`;
+        
+        bgElement.style.background = `radial-gradient(circle at center, ${centerColor} 0%, ${midColor} 60%, #000000 100%)`;
+        
+        // Добавляем фон в контейнер игры (перед canvas)
+        const container = document.querySelector('.game-container');
+        if (container) {
+            container.insertBefore(bgElement, document.getElementById('gameCanvas'));
+        }
     }
 
     startGame() {
