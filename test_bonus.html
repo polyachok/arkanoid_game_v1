@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест бонусов</title>
+    <style>
+        body { margin: 0; background: #111; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        canvas { border: 2px solid #333; }
+        #info { position: absolute; top: 10px; left: 10px; color: white; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div id="info">Кликайте по блокам для теста выпадения бонусов</div>
+    <canvas id="gameCanvas"></canvas>
+    <script src="js/utils.js"></script>
+    <script src="js/entities.js"></script>
+    <script src="js/levels.js"></script>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 800;
+        canvas.height = 600;
+
+        // Создаём тестовый блок
+        const block = new Block(350, 200, 60, 24, 1, '#ff2d95');
+        const bonuses = [];
+        
+        // Тестируем выпадение бонусов
+        function testBonusDrop() {
+            if (!block.active) return;
+            
+            block.hit();
+            
+            const bonusChance = Math.random();
+            const antibonusChance = Math.random();
+            
+            console.log('bonusChance:', bonusChance, 'threshold:', Levels.getBonusDropChance());
+            console.log('antibonusChance:', antibonusChance, 'threshold:', Levels.getAntibonusDropChance());
+            
+            if (bonusChance < Levels.getBonusDropChance()) {
+                const type = Levels.getBonusType();
+                bonuses.push(new Bonus(block.x + block.width/2 - 12, block.y + block.height/2 - 12, type));
+                console.log('✓ БОНУС:', type);
+            }
+            
+            if (antibonusChance < Levels.getAntibonusDropChance()) {
+                const type = Levels.getAntibonusType();
+                bonuses.push(new Bonus(block.x + block.width/2 - 12, block.y + block.height/2 - 12, type));
+                console.log('✗ АНТИ-БОНУС:', type);
+            }
+        }
+
+        canvas.addEventListener('click', testBonusDrop);
+
+        function animate() {
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем блок
+            block.draw(ctx);
+            
+            // Обновляем и рисуем бонусы
+            for (let i = bonuses.length - 1; i >= 0; i--) {
+                const bonus = bonuses[i];
+                bonus.update();
+                bonus.draw(ctx);
+                
+                if (bonus.y > canvas.height) {
+                    bonuses.splice(i, 1);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
