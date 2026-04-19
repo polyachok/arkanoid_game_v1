@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Арканоид</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Верхняя панель -->
+        <div class="hud">
+            <div class="hud-item">
+                <span class="hud-label">Очки</span>
+                <span class="hud-value" id="scoreDisplay">0</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">Уровень</span>
+                <span class="hud-value" id="levelDisplay">1</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">Жизни</span>
+                <span class="hud-value" id="livesDisplay">❤❤❤</span>
+            </div>
+            <button class="hud-btn" id="pauseBtn">⏸</button>
+        </div>
+
+        <!-- Экран меню -->
+        <div class="overlay" id="menuOverlay">
+            <div class="overlay-content">
+                <h1 class="game-title">АРКАНОИД</h1>
+                <p class="game-subtitle">Современная версия классики</p>
+                <button class="btn btn-primary" id="startBtn">Начать игру</button>
+                <div class="controls-hint">
+                    <p>Мышь / Стрелки / WASD — движение</p>
+                    <p>Пробел — пауза</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран паузы -->
+        <div class="overlay hidden" id="pauseOverlay">
+            <div class="overlay-content">
+                <h2>ПАУЗА</h2>
+                <button class="btn btn-primary" id="resumeBtn">Продолжить</button>
+                <button class="btn btn-secondary" id="restartFromPauseBtn">Заново</button>
+            </div>
+        </div>
+
+        <!-- Экран победы -->
+        <div class="overlay hidden" id="winOverlay">
+            <div class="overlay-content">
+                <h2>ПОБЕДА!</h2>
+                <p class="final-score">Очки: <span id="finalScoreWin">0</span></p>
+                <button class="btn btn-primary" id="nextLevelBtn">Следующий уровень</button>
+                <button class="btn btn-secondary" id="restartFromWinBtn">В меню</button>
+            </div>
+        </div>
+
+        <!-- Экран поражения -->
+        <div class="overlay hidden" id="gameOverOverlay">
+            <div class="overlay-content">
+                <h2>ИГРА ОКОНЧЕНА</h2>
+                <p class="final-score">Очки: <span id="finalScoreLose">0</span></p>
+                <button class="btn btn-primary" id="retryBtn">Попробовать снова</button>
+                <button class="btn btn-secondary" id="restartFromLoseBtn">В меню</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/entities.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
