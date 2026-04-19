@@ -10,6 +10,11 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #0a0a1a;
     color: #fff;
+    /* Запрет зума и выделения на мобильных */
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
 }
 
 /* ===== Контейнер игры ===== */
@@ -28,6 +33,9 @@ body {
     box-shadow:
         0 0 30px rgba(0, 200, 255, 0.15),
         0 0 60px rgba(120, 0, 255, 0.1);
+    /* Canvas занимает максимум места, сохраняя пропорции */
+    max-width: 100%;
+    max-height: 100%;
 }
 
 /* ===== HUD ===== */
@@ -39,8 +47,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 40px;
-    padding: 16px 24px;
+    gap: 20px;
+    padding: 10px 16px;
     z-index: 10;
     pointer-events: none;
 }
@@ -53,14 +61,14 @@ body {
 }
 
 .hud-label {
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: rgba(255, 255, 255, 0.5);
 }
 
 .hud-value {
-    font-size: 22px;
+    font-size: 16px;
     font-weight: 700;
     text-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
 }
@@ -70,18 +78,28 @@ body {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
-    font-size: 20px;
-    width: 40px;
-    height: 40px;
+    font-size: 18px;
+    width: 36px;
+    height: 36px;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
+    /* Увеличенная область нажатия для мобильных */
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hud-btn:hover {
     background: rgba(255, 255, 255, 0.2);
     border-color: rgba(0, 200, 255, 0.5);
     box-shadow: 0 0 15px rgba(0, 200, 255, 0.3);
+}
+
+.hud-btn:active {
+    transform: scale(0.95);
 }
 
 /* ===== Overlay ===== */
@@ -144,7 +162,7 @@ body {
 }
 
 .overlay-content h2 {
-    font-size: 48px;
+    font-size: 36px;
     font-weight: 800;
     margin-bottom: 16px;
     background: linear-gradient(135deg, #00c8ff, #7b2fff);
@@ -155,9 +173,9 @@ body {
 }
 
 .final-score {
-    font-size: 20px;
+    font-size: 16px;
     color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 }
 
 .final-score span {
@@ -169,10 +187,10 @@ body {
 /* ===== Кнопки ===== */
 .btn {
     display: block;
-    width: 260px;
-    margin: 0 auto 16px;
-    padding: 14px 24px;
-    font-size: 16px;
+    width: 240px;
+    margin: 0 auto 12px;
+    padding: 12px 20px;
+    font-size: 14px;
     font-weight: 600;
     letter-spacing: 1px;
     border: none;
@@ -180,6 +198,8 @@ body {
     cursor: pointer;
     transition: all 0.25s ease;
     text-transform: uppercase;
+    /* Увеличенная область нажатия для мобильных */
+    min-height: 48px;
 }
 
 .btn-primary {
@@ -215,13 +235,82 @@ body {
 
 /* ===== Подсказки ===== */
 .controls-hint {
-    margin-top: 40px;
-    padding-top: 24px;
+    margin-top: 32px;
+    padding-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .controls-hint p {
-    font-size: 13px;
+    font-size: 12px;
     color: rgba(255, 255, 255, 0.35);
     margin-bottom: 4px;
+}
+
+/* ===== Адаптивность для мобильных ===== */
+@media (max-width: 768px) {
+    .game-title {
+        font-size: 42px !important;
+        letter-spacing: 6px !important;
+    }
+    
+    .game-subtitle {
+        font-size: 12px !important;
+        margin-bottom: 24px !important;
+    }
+    
+    .overlay-content h2 {
+        font-size: 28px !important;
+    }
+    
+    .btn {
+        width: 200px !important;
+        font-size: 13px !important;
+    }
+    
+    .hud-label {
+        font-size: 9px !important;
+    }
+    
+    .hud-value {
+        font-size: 14px !important;
+    }
+    
+    .controls-hint p {
+        font-size: 11px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-title {
+        font-size: 32px !important;
+        letter-spacing: 4px !important;
+    }
+    
+    .game-subtitle {
+        font-size: 10px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .overlay-content h2 {
+        font-size: 24px !important;
+    }
+    
+    .btn {
+        width: 180px !important;
+        font-size: 12px !important;
+        padding: 10px 16px !important;
+    }
+    
+    .hud {
+        gap: 12px !important;
+        padding: 8px 12px !important;
+    }
+    
+    .hud-label {
+        font-size: 8px !important;
+    }
+    
+    .hud-value {
+        font-size: 12px !important;
+    }
 }

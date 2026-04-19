@@ -76,7 +76,7 @@ const Levels = {
         const blockWidth = 55;
         const blockHeight = 22;
         const totalWidth = baseCols * blockWidth + (baseCols - 1) * this.blockPadding;
-        const startX = (800 - totalWidth) / 2;
+        let startX = (800 - totalWidth) / 2;
         let row = 0;
         let cols = baseCols;
 

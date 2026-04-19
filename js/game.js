@@ -52,13 +52,38 @@ class Game {
     }
 
     setupCanvas() {
-        // Масштабирование под экран
-        const scaleX = window.innerWidth / this.width;
-        const scaleY = window.innerHeight / this.height;
-        const scale = Math.min(scaleX, scaleY);
-
-        this.canvas.style.width = `${this.width * scale}px`;
-        this.canvas.style.height = `${this.height * scale}px`;
+        // Адаптивное масштабирование под экран
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+    }
+    
+    resize() {
+        // Внутреннее разрешение canvas (логическое)
+        const logicalWidth = 800;
+        const logicalHeight = 600;
+        
+        // Физические размеры экрана
+        const displayWidth = window.innerWidth;
+        const displayHeight = window.innerHeight;
+        
+        // Вычисляем масштаб для сохранения пропорций
+        const scale = Math.min(
+            displayWidth / logicalWidth,
+            displayHeight / logicalHeight
+        );
+        
+        // Устанавливаем физические размеры canvas
+        this.canvas.width = logicalWidth;
+        this.canvas.height = logicalHeight;
+        
+        // Масштабируем через CSS
+        this.canvas.style.width = `${logicalWidth * scale}px`;
+        this.canvas.style.height = `${logicalHeight * scale}px`;
+        
+        // Сохраняем масштаб для преобразования координат
+        this.scale = scale;
+        this.displayWidth = logicalWidth * scale;
+        this.displayHeight = logicalHeight * scale;
     }
 
     createPaddle() {
