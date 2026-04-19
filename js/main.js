@@ -126,13 +126,42 @@ document.addEventListener('keyup', (e) => {
     keys[e.code] = false;
 });
 
-// Мышь
+// Мышь и тач
 canvas.addEventListener('mousemove', (e) => {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     mouseX = (e.clientX - rect.left) * scaleX;
     mouseActive = true;
 });
+
+// Поддержка touch-событий для мобильных
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const touch = e.touches[0];
+    mouseX = (touch.clientX - rect.left) * scaleX;
+    mouseActive = true;
+    
+    // Запуск мяча при тапе
+    if (game.state === 'playing') {
+        game.launchBall();
+    }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const touch = e.touches[0];
+    mouseX = (touch.clientX - rect.left) * scaleX;
+    mouseActive = true;
+}, { passive: false });
+
+canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    // Не сбрасываем mouseActive, чтобы платформа осталась на месте
+}, { passive: false });
 
 canvas.addEventListener('click', () => {
     if (game.state === 'playing') {
