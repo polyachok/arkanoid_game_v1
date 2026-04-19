@@ -290,11 +290,17 @@ class Bonus {
         this.y = y;
         this.width = 24;
         this.height = 24;
-        this.type = type; // 'multiBall', 'expandPaddle', 'slow', 'extraLife'
+        this.type = type; // 'multiBall', 'expandPaddle', 'slow', 'extraLife', 'shrinkPaddle', 'speedUp', 'stealLife'
         this.speed = 2;
         this.active = true;
         this.angle = 0;
         this.pulse = 0;
+        this.revealed = false; // Скрыт ли тип бонуса
+        
+        // Цвета для скрытого состояния (загадочный серый/фиолетовый)
+        this.hiddenColor = '#6a4a9c';
+        this.hiddenGlowColor = 'rgba(106, 74, 156, 0.6)';
+        this.hiddenSymbol = '?';
 
         switch (type) {
             case 'multiBall':
@@ -336,6 +342,10 @@ class Bonus {
         }
     }
 
+    reveal() {
+        this.revealed = true;
+    }
+
     update() {
         this.y += this.speed;
         this.angle += 0.05;
@@ -347,11 +357,16 @@ class Bonus {
         const cx = this.x + this.width / 2;
         const cy = this.y + this.height / 2;
 
+        // Используем скрытые цвета пока бонус не раскрыт
+        const displayColor = this.revealed ? this.color : this.hiddenColor;
+        const displayGlow = this.revealed ? this.glowColor : this.hiddenGlowColor;
+        const displaySymbol = this.revealed ? this.symbol : this.hiddenSymbol;
+
         Utils.drawGlow(ctx, () => {
             // Круглый фон
             ctx.beginPath();
             ctx.arc(cx, cy, (this.width / 2) * scale, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
+            ctx.fillStyle = displayColor;
             ctx.fill();
 
             // Внутреннее свечение
@@ -368,8 +383,8 @@ class Bonus {
             ctx.font = `bold ${Math.floor(12 * scale)}px Segoe UI`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(this.symbol, cx, cy);
-        }, this.glowColor, 15);
+            ctx.fillText(displaySymbol, cx, cy);
+        }, displayGlow, 15);
     }
 }
 

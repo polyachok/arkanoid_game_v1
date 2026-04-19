@@ -111,6 +111,15 @@ class Game {
 
     // Обработка бонуса
     applyBonus(bonus) {
+        // Раскрываем бонус перед применением
+        bonus.reveal();
+        
+        // Создаём визуальный эффект при поимке бонуса
+        const centerX = bonus.x + bonus.width / 2;
+        const centerY = bonus.y + bonus.height / 2;
+        this.particles.push(...Utils.createExplosion(centerX, centerY, bonus.color, 20));
+        this.shakeAmount = 5;
+        
         switch (bonus.type) {
             case 'multiBall':
                 this.splitBall();
