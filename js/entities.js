@@ -289,43 +289,58 @@ class Bonus {
         this.active = true;
         this.angle = 0;
         this.pulse = 0;
+        
+        // Скрытый тип - визуально все бонусы одинаковые до поимки
+        this.revealed = false;
+        this.revealTimer = 0;
+        this.revealDuration = 60; // 1 секунда на показ типа
+        
+        // Визуальные параметры для нераскрытого бонуса
+        this.hiddenColor = '#ffffff';
+        this.hiddenSymbol = '?';
+        this.hiddenGlowColor = 'rgba(255, 255, 255, 0.6)';
+        
+        // Параметры для раскрытого бонуса (после поимки - для эффекта)
+        this.revealedColor = null;
+        this.revealedSymbol = null;
+        this.revealedGlowColor = null;
 
         switch (type) {
             case 'multiBall':
-                this.color = '#ff2d95';
-                this.symbol = '×3';
-                this.glowColor = 'rgba(255, 45, 149, 0.6)';
+                this.revealedColor = '#ff2d95';
+                this.revealedSymbol = '×3';
+                this.revealedGlowColor = 'rgba(255, 45, 149, 0.6)';
                 break;
             case 'expandPaddle':
-                this.color = '#00ff88';
-                this.symbol = '▬';
-                this.glowColor = 'rgba(0, 255, 136, 0.6)';
+                this.revealedColor = '#00ff88';
+                this.revealedSymbol = '▬';
+                this.revealedGlowColor = 'rgba(0, 255, 136, 0.6)';
                 break;
             case 'slow':
-                this.color = '#00c8ff';
-                this.symbol = '◎';
-                this.glowColor = 'rgba(0, 200, 255, 0.6)';
+                this.revealedColor = '#00c8ff';
+                this.revealedSymbol = '◎';
+                this.revealedGlowColor = 'rgba(0, 200, 255, 0.6)';
                 break;
             case 'extraLife':
-                this.color = '#ffaa00';
-                this.symbol = '♥';
-                this.glowColor = 'rgba(255, 170, 0, 0.6)';
+                this.revealedColor = '#ffaa00';
+                this.revealedSymbol = '♥';
+                this.revealedGlowColor = 'rgba(255, 170, 0, 0.6)';
                 break;
             // Анти-бонусы
             case 'shrinkPaddle':
-                this.color = '#ff2255';
-                this.symbol = '▬';
-                this.glowColor = 'rgba(255, 34, 85, 0.6)';
+                this.revealedColor = '#ff2255';
+                this.revealedSymbol = '▬';
+                this.revealedGlowColor = 'rgba(255, 34, 85, 0.6)';
                 break;
             case 'speedUp':
-                this.color = '#cc22ff';
-                this.symbol = '▶';
-                this.glowColor = 'rgba(200, 34, 255, 0.6)';
+                this.revealedColor = '#cc22ff';
+                this.revealedSymbol = '▶';
+                this.revealedGlowColor = 'rgba(200, 34, 255, 0.6)';
                 break;
             case 'stealLife':
-                this.color = '#444444';
-                this.symbol = '✕';
-                this.glowColor = 'rgba(80, 80, 80, 0.7)';
+                this.revealedColor = '#444444';
+                this.revealedSymbol = '✕';
+                this.revealedGlowColor = 'rgba(80, 80, 80, 0.7)';
                 break;
         }
     }
@@ -334,6 +349,16 @@ class Bonus {
         this.y += this.speed;
         this.angle += 0.05;
         this.pulse = Math.sin(this.angle) * 0.15 + 1;
+        
+        // Таймер раскрытия (после поимки)
+        if (this.revealed) {
+            this.revealTimer--;
+        }
+    }
+
+    reveal() {
+        this.revealed = true;
+        this.revealTimer = this.revealDuration;
     }
 
     draw(ctx) {
@@ -341,11 +366,16 @@ class Bonus {
         const cx = this.x + this.width / 2;
         const cy = this.y + this.height / 2;
 
+        // Определяем текущие цвета
+        const currentColor = this.revealed ? this.revealedColor : this.hiddenColor;
+        const currentSymbol = this.revealed ? this.revealedSymbol : this.hiddenSymbol;
+        const currentGlowColor = this.revealed ? this.revealedGlowColor : this.hiddenGlowColor;
+
         Utils.drawGlow(ctx, () => {
             // Круглый фон
             ctx.beginPath();
             ctx.arc(cx, cy, (this.width / 2) * scale, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
+            ctx.fillStyle = currentColor;
             ctx.fill();
 
             // Внутреннее свечение
@@ -362,8 +392,8 @@ class Bonus {
             ctx.font = `bold ${Math.floor(12 * scale)}px Segoe UI`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(this.symbol, cx, cy);
-        }, this.glowColor, 15);
+            ctx.fillText(currentSymbol, cx, cy);
+        }, currentGlowColor, 15);
     }
 }
 
