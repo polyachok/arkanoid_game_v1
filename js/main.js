@@ -107,18 +107,24 @@ let mouseActive = false;
 document.addEventListener('keydown', (e) => {
     keys[e.code] = true;
 
+    // Пауза по Space
     if (e.code === 'Space') {
         e.preventDefault();
         if (game.state === 'playing') {
             pauseGame();
+            return;
         } else if (game.state === 'paused') {
             resumeGame();
+            return;
         }
     }
 
-    // Запуск мяча
+    // Запуск мяча (только если игра активна и мяч не запущен)
     if (e.code === 'Space' && game.state === 'playing') {
-        game.launchBall();
+        const unlaunchedBall = game.balls.find(b => !b.launched);
+        if (unlaunchedBall) {
+            game.launchBall();
+        }
     }
 });
 

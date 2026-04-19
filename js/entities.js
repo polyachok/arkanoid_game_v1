@@ -83,12 +83,14 @@ class Ball {
     }
 
     changeSpeed(factor) {
-        this.baseSpeed = this.speed * factor;
         const currentSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         if (currentSpeed > 0) {
+            this.baseSpeed *= factor;
             const ratio = this.baseSpeed / currentSpeed;
             this.dx *= ratio;
             this.dy *= ratio;
+        } else {
+            this.baseSpeed *= factor;
         }
     }
 
@@ -113,7 +115,9 @@ class Paddle {
         this.color = '#7b2fff';
         this.glowColor = 'rgba(120, 0, 255, 0.6)';
         this.expanded = false;
+        this.shrunk = false;
         this.expandTimer = 0;
+        this.shrinkTimer = 0;
         this.expandDuration = 600; // 10 сек при 60fps
     }
 
@@ -121,6 +125,12 @@ class Paddle {
         this.targetWidth = this.width * 1.5;
         this.expanded = true;
         this.expandTimer = this.expandDuration;
+    }
+
+    shrink() {
+        this.targetWidth = this.width * 0.6;
+        this.shrunk = true;
+        this.shrinkTimer = this.expandDuration;
     }
 
     update() {
@@ -133,9 +143,17 @@ class Paddle {
         if (this.expanded) {
             this.expandTimer--;
             if (this.expandTimer <= 0) {
-                this.targetWidth = this.width;
-                this.width = this.targetWidth;
+                this.targetWidth = 120; // Базовая ширина
                 this.expanded = false;
+            }
+        }
+
+        // Таймер сужения
+        if (this.shrunk) {
+            this.shrinkTimer--;
+            if (this.shrinkTimer <= 0) {
+                this.targetWidth = 120; // Базовая ширина
+                this.shrunk = false;
             }
         }
     }

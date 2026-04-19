@@ -130,6 +130,24 @@ class Game {
                 this.lives = Math.min(this.lives + 1, 5);
                 this.showComboText('+Жизнь!', '#ffaa00');
                 break;
+            // Анти-бонусы
+            case 'shrinkPaddle':
+                this.paddle.shrink();
+                this.showComboText('-Сужение!', '#ff2255');
+                break;
+            case 'speedUp':
+                for (const ball of this.balls) {
+                    ball.changeSpeed(1.4);
+                }
+                this.showComboText('-Ускорение!', '#cc22ff');
+                break;
+            case 'stealLife':
+                this.lives = Math.max(this.lives - 1, 0);
+                this.showComboText('-Жизнь!', '#444444');
+                if (this.lives <= 0) {
+                    this.state = 'gameover';
+                }
+                break;
         }
     }
 
@@ -159,7 +177,8 @@ class Game {
         };
     }
 
-    // Коллизия мяча с блоками
+    // Исправлено: удалили дублирование начисления очков и проверки блока
+    // Очки начисляются только один раз при уничтожении блока (см. checkBlockCollisions)
     checkBlockCollisions(ball) {
         for (const block of this.blocks) {
             if (!block.active) continue;
@@ -189,9 +208,10 @@ class Game {
                 this.combo++;
                 this.maxCombo = Math.max(this.maxCombo, this.combo);
 
-                // Очки с бонусом за комбо
+                // Очки с бонусом за комбо (начисляются при попадании)
                 const comboMultiplier = 1 + this.combo * 0.1;
-                this.score += Math.floor(block.points * comboMultiplier);
+                const hitPoints = Math.floor(block.points * comboMultiplier * 0.3);
+                this.score += hitPoints;
 
                 // Частицы
                 const blockCenterX_pos = block.x + block.width / 2;
@@ -221,12 +241,13 @@ class Game {
                     ));
                 }
 
-                // Удаляем мёртвые блоки
+                // Удаляем мёртвые блоки и начисляем очки один раз
                 if (!block.active) {
                     this.score += block.points;
+                    break; // Выход после уничтожения блока
+                } else {
+                    break; // Выход после попадания, но блок ещё жив
                 }
-
-                break; // Один блок за кадр
             }
         }
     }
@@ -275,6 +296,14 @@ class Game {
         if (ball.y - ball.radius <= 0) {
             ball.y = ball.radius;
             ball.dy = Math.abs(ball.dy);
+        }
+    }
+
+    // Проверка победы на уровне
+    checkLevelComplete() {
+        const activeBlocks = this.blocks.filter(b => b.active).length;
+        if (activeBlocks === 0) {
+            this.state = 'win';
         }
     }
 
@@ -358,9 +387,7 @@ class Game {
         }
 
         // Проверка победы
-        if (this.blocks.every(b => !b.active)) {
-            this.state = 'win';
-        }
+        this.checkLevelComplete();
     }
 
     // Отрисовка
